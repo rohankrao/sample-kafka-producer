@@ -15,16 +15,22 @@ import (
 
 // VectorDemoLogs is a demo logs record from Vector
 type VectorDemoLogs struct {
-	//ContainerCreatedAt string            `json:"container_created_at"`
-	//ContainerId        string            `json:"container_id"`
-	//ContainerName      string            `json:"container_name"`
+	ContainerCreatedAt string `json:"container_created_at"`
+	ContainerId        string `json:"container_id"`
+	ContainerName      string `json:"container_name"`
 	//Host               string            `json:"host"`
-	//Stream             string            `json:"stream"`
-	//Label              map[string]string `json:"label"`
+	Stream string            `json:"stream"`
+	Level  string            `json:"level"`
+	Label  map[string]string `json:"label"`
 
 	Message    string `json:"message"`
 	SourceType string `json:"source_type"`
 	Timestamp  string `json:"timestamp"`
+
+	//BooleanField bool          `json:"booleanField"`
+	//IntField     int           `json:"intField"`
+	//DecimalField types.Decimal `json:"decimalField"`
+	//DateField    types.Decimal `json:"dateField"`
 }
 
 type RecordsHandler struct {
@@ -48,6 +54,7 @@ func (rh *RecordsHandler) produce(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, record := range records {
+		record.Level = "info"
 		payload, err := rh.ser.Serialize(rh.topic, &record)
 		if err != nil {
 			fmt.Printf("Failed to serialize payload: %s\n", err)
@@ -74,7 +81,7 @@ func (rh *RecordsHandler) produce(w http.ResponseWriter, r *http.Request) {
 func main() {
 	bootstrapServers := "192.168.1.6:9092"
 	url := "http://192.168.1.6:30081"
-	topic := "test-go-demo-logs"
+	topic := "vector-docker-logs7"
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": bootstrapServers})
 
